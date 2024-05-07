@@ -8,9 +8,9 @@
 
 
 // Comment this out to disable prints and save space
-#define BLYNK_PRINT Serial
+// #define BLYNK_PRINT Serial
 #define GAS_PIN  A0
-#define RELAY_PIN 1
+#define RELAY_PIN 5
 
 #define DATASTREAM V0
 #define STATUS V1
@@ -32,27 +32,29 @@ void notify_on_gas_detection()
   Blynk.virtualWrite(DATASTREAM, gas_value);
   Blynk.virtualWrite(STATUS, 1);
 
-  if (gas_value>=150) {
+  if (gas_value>=350) {
     Serial.println("Leakage detected!");
-    // Blynk.notify("Alert : Gas Leakage detected in Home");
-    // Blynk.logEvent("leakage_alert","Gas Leakage detected in Home");
-    
+    digitalWrite(LED_BUILTIN, LOW); //turn on led
     digitalWrite(RELAY_PIN, LOW); //turn on the relay
   }
   else{
+    Serial.println("Relay off");
+    digitalWrite(LED_BUILTIN, HIGH); //turn off led
     digitalWrite(RELAY_PIN, HIGH); //turn off the realy
-
+    
   }
+
 }
 
 void setup(){
-  Serial.begin(115200);
+  Serial.begin(9600);
   
   pinMode(GAS_PIN, INPUT);
   pinMode(RELAY_PIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   
   Blynk.begin(auth, ssid, pass);
-  timer.setInterval(5000L, notify_on_gas_detection);
+  timer.setInterval(2000L, notify_on_gas_detection);
 }
 
 void loop(){
